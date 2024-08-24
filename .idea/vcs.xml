@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Part1/wait-notify-excercise" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Part2/snake-race-thread-concurrency" vcs="Git" />
   </component>
 </project>
