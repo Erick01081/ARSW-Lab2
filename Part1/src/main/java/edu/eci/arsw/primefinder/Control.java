@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Control extends Thread {
     private final static int NTHREADS = 3;
     private final static int MAXVALUE = 100000000;
-    private final static int TMILISECONDS = 120000;
+    private final static int TMILISECONDS = 5000;
 
     private final int NDATA = MAXVALUE / NTHREADS;
 
@@ -15,7 +15,6 @@ public class Control extends Thread {
     private Control() {
         super();
         this.pft = new PrimeFinderThread[NTHREADS];
-
         int i;
         for(i = 0; i < NTHREADS - 1; i++) {
             PrimeFinderThread elem = new PrimeFinderThread(i*NDATA, (i+1)*NDATA);
@@ -33,40 +32,43 @@ public class Control extends Thread {
         for(int i = 0; i < NTHREADS; i++) {
             pft[i].start();
         }
+        process();
+    }
 
-        Scanner scanner = new Scanner(System.in);
+    private void process(){
         long startTime = System.currentTimeMillis();
-
         while (true) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - startTime >= TMILISECONDS) {
-                pauseThreads();
-                printPrimeCount();
-
-                System.out.println("Presione ENTER para continuar...");
-
-                synchronized (lock) {
-                    try {
-                        scanner.nextLine(); // Espera la entrada del usuario
-                        lock.notify(); // Notifica para continuar después de ENTER
-                    } catch (Exception e) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
-                }
-
-                resumeThreads();
-                startTime = System.currentTimeMillis(); // Reiniciar el temporizador
+                pauseExecution();
+                startTime = System.currentTimeMillis();
             }
             synchronized (lock) {
                 try {
-                    lock.wait(1); // Espera corta usando el lock
+                    lock.wait(1);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
                 }
             }
         }
+    }
+
+    private void pauseExecution(){
+        Scanner scanner = new Scanner(System.in);
+        pauseThreads();
+        printPrimeCount();
+        System.out.println("Presione ENTER para continuar...");
+        synchronized (lock) {
+            try {
+                scanner.nextLine(); // Espera la entrada del usuario
+                lock.notify(); // Notifica para continuar después de ENTER
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        resumeThreads();
     }
 
     private void pauseThreads() {

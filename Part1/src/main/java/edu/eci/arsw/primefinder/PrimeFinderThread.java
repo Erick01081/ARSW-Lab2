@@ -4,31 +4,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PrimeFinderThread extends Thread {
-    int a, b;
+    int start, end;
     private List<Integer> primes;
     private volatile boolean paused = false;
     private final Object pauseLock = new Object();
 
-    public PrimeFinderThread(int a, int b) {
+    public PrimeFinderThread(int start, int end) {
         super();
         this.primes = new LinkedList<>();
-        this.a = a;
-        this.b = b;
+        this.start = start;
+        this.end = end;
     }
 
     @Override
     public void run() {
-        for (int i = a; i < b; i++) {
-            synchronized (pauseLock) {
-                while (paused) {
-                    try {
-                        pauseLock.wait(); // Espera a que se reanude
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
-            }
+        for (int i = start; i < end; i++) {
+            verifyPauseThread();
             if (isPrime(i)) {
                 primes.add(i);
                 System.out.println(i);
@@ -54,13 +45,27 @@ public class PrimeFinderThread extends Thread {
     }
 
     public void pauseThread() {
-        paused = true;
+        synchronized (pauseLock) {
+            paused = true;
+        }
     }
 
     public void resumeThread() {
         synchronized (pauseLock) {
             paused = false;
-            pauseLock.notify(); // Notifica para reanudar el hilo
+            pauseLock.notifyAll();
+        }
+    }
+
+    public void verifyPauseThread() {
+        synchronized (pauseLock) {
+            while (paused) {
+                try {
+                    pauseLock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
     }
 }
