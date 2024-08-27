@@ -48,13 +48,10 @@ public class Snake extends Observable implements Runnable {
     @Override
     public void run() {
         while (!snakeEnd) {
-            
             snakeCalc();
-
             //NOTIFY CHANGES TO GUI
             setChanged();
             notifyObservers();
-
             try {
                 if (hasTurbo == true) {
                     Thread.sleep(500 / 3);
@@ -64,12 +61,8 @@ public class Snake extends Observable implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
-        
         fixDirection(head);
-        
-        
     }
 
     private void snakeCalc() {
@@ -168,7 +161,6 @@ public class Snake extends Observable implements Runnable {
     }
 
     private void checkIfJumpPad(Cell newCell) {
-
         if (Board.gameboard[newCell.getX()][newCell.getY()].isJump_pad()) {
             // get jump_pad
             for (int i = 0; i != Board.NR_JUMP_PADS; i++) {
@@ -177,7 +169,6 @@ public class Snake extends Observable implements Runnable {
                     Board.jump_pads[i] = new Cell(-5, -5);
                     this.jumps++;
                 }
-
             }
             System.out.println("[" + idt + "] " + "GETTING JUMP PAD "
                     + newCell.toString());

@@ -66,11 +66,8 @@ public class SnakeApp {
     }
 
     private void init() {
-        
-        
-        
         for (int i = 0; i != MAX_THREADS; i++) {
-            
+
             snakes[i] = new Snake(i + 1, spawn[i], i + 1);
             snakes[i].addObserver(board);
             thread[i] = new Thread(snakes[i]);
@@ -79,16 +76,18 @@ public class SnakeApp {
 
         frame.setVisible(true);
 
-            
-        while (true) {
-            int x = 0;
+        int x = 0;
+        while (x != MAX_THREADS) {
+            x = 0;
             for (int i = 0; i != MAX_THREADS; i++) {
                 if (snakes[i].isSnakeEnd() == true) {
                     x++;
                 }
             }
-            if (x == MAX_THREADS) {
-                break;
+            try {
+                Thread.sleep(100); // Espera 100 milisegundos
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
