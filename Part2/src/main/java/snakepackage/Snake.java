@@ -337,9 +337,9 @@ public class Snake extends Observable implements Runnable {
     }*/
 
     public LinkedList<Cell> getBody() {
-        //synchronized (lockSnakeBody){
+        synchronized (lockSnakeBody){
             return new LinkedList<>(this.snakeBody);
-        //}
+        }
     }
 
     public boolean isSelected() {
