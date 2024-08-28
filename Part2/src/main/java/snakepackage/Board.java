@@ -184,6 +184,7 @@ public class Board extends JLabel implements Observer {
 	private void drawSnake(Graphics g) {
 		for (int i = 0; i != SnakeApp.MAX_THREADS; i++) {
 			for (Cell p : SnakeApp.getApp().snakes[i].getBody()) {
+				System.out.println(SnakeApp.getApp().snakes[i].getBody() + " " + i);
 				if (p.equals(SnakeApp.getApp().snakes[i].getBody().peekFirst())) {
 					g.setColor(new Color(050+(i*10), 205, 150));
 					g.fillRect(p.getX() * GridSize.WIDTH_BOX, p.getY()
@@ -196,11 +197,10 @@ public class Board extends JLabel implements Observer {
 						g.setColor(new Color(034, 139, 034));
 					g.fillRect(p.getX() * GridSize.WIDTH_BOX, p.getY()
 							* GridSize.HEIGH_BOX, GridSize.WIDTH_BOX,
-							GridSize.HEIGH_BOX);
+							GridSize.HEIGH_BOX );
 				}
 			}
 		}
-
 	}
 
 	private void drawGrid(Graphics g) {

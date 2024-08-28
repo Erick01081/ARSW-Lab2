@@ -26,6 +26,9 @@ public class Snake extends Observable implements Runnable {
     private boolean isSelected = false;
     private int growing = 0;
     public boolean goal = false;
+    private final Object lock = new Object();
+    private final Object lockGui = new Object();
+    private final Object lockSnakeBody = new Object();
 
     public Snake(int idt, Cell head, int direction) {
         this.idt = idt;
@@ -35,13 +38,17 @@ public class Snake extends Observable implements Runnable {
     }
 
     public boolean isSnakeEnd() {
-        return snakeEnd;
+        synchronized (lock) {
+            return snakeEnd;
+        }
     }
 
     private void generateSnake(Cell head) {
         start = head;
         //Board.gameboard[head.getX()][head.getY()].reserveCell(jumps, idt);
-        snakeBody.add(head);
+        synchronized (lockSnakeBody) {
+            snakeBody.add(head);
+        }
         growing = INIT_SIZE - 1;
     }
 
@@ -50,13 +57,15 @@ public class Snake extends Observable implements Runnable {
         while (!snakeEnd) {
             snakeCalc();
             //NOTIFY CHANGES TO GUI
-            setChanged();
-            notifyObservers();
+            synchronized (lockGui){
+                setChanged();
+                notifyObservers();
+            }
             try {
                 if (hasTurbo == true) {
-                    Thread.sleep(500 / 3);
+                    Thread.sleep(1 / 3);
                 } else {
-                    Thread.sleep(500);
+                    Thread.sleep(1);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -66,7 +75,9 @@ public class Snake extends Observable implements Runnable {
     }
 
     private void snakeCalc() {
-        head = snakeBody.peekFirst();
+        synchronized (lockSnakeBody) {
+            head = snakeBody.peekFirst();
+        }
 
         newCell = head;
 
@@ -78,12 +89,15 @@ public class Snake extends Observable implements Runnable {
         checkIfJumpPad(newCell);
         checkIfTurboBoost(newCell);
         checkIfBarrier(newCell);
-        
-        snakeBody.push(newCell);
+        synchronized (lockSnakeBody) {
+            snakeBody.push(newCell);
+        }
 
         if (growing <= 0) {
-            newCell = snakeBody.peekLast();
-            snakeBody.remove(snakeBody.peekLast());
+            synchronized (lockSnakeBody) {
+                newCell = snakeBody.peekLast();
+                snakeBody.remove(snakeBody.peekLast());
+            }
             Board.gameboard[newCell.getX()][newCell.getY()].freeCell();
         } else if (growing != 0) {
             growing--;
@@ -96,7 +110,9 @@ public class Snake extends Observable implements Runnable {
             // crash
             System.out.println("[" + idt + "] " + "CRASHED AGAINST BARRIER "
                     + newCell.toString());
-            snakeEnd=true;
+            synchronized (lock) {
+                snakeEnd = true;
+            }
         }
     }
 
@@ -121,9 +137,11 @@ public class Snake extends Observable implements Runnable {
     }
 
     private boolean checkIfOwnBody(Cell newCell) {
-        for (Cell c : snakeBody) {
-            if (newCell.getX() == c.getX() && newCell.getY() == c.getY()) {
-                return true;
+        synchronized (lockSnakeBody) {
+            for (Cell c : snakeBody) {
+                if (newCell.getX() == c.getX() && newCell.getY() == c.getY()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -319,7 +337,9 @@ public class Snake extends Observable implements Runnable {
     }*/
 
     public LinkedList<Cell> getBody() {
-        return this.snakeBody;
+        //synchronized (lockSnakeBody){
+            return new LinkedList<>(this.snakeBody);
+        //}
     }
 
     public boolean isSelected() {
