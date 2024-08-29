@@ -29,6 +29,8 @@ public class Snake extends Observable implements Runnable {
     private final Object lock = new Object();
     private final Object lockGui = new Object();
     private final Object lockSnakeBody = new Object();
+    private boolean isPaused = false;
+    private final Object pauseLock = new Object();
 
     public Snake(int idt, Cell head, int direction) {
         this.idt = idt;
@@ -55,14 +57,26 @@ public class Snake extends Observable implements Runnable {
     @Override
     public void run() {
         while (!snakeEnd) {
+            synchronized (pauseLock) {
+                if (isPaused) {
+                    try {
+                        pauseLock.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+            }
+
             snakeCalc();
-            //NOTIFY CHANGES TO GUI
-            synchronized (lockGui){
+
+            synchronized (lockGui) {
                 setChanged();
                 notifyObservers();
             }
+
             try {
-                if (hasTurbo == true) {
+                if (hasTurbo) {
                     Thread.sleep(1 / 3);
                 } else {
                     Thread.sleep(1);
@@ -352,6 +366,17 @@ public class Snake extends Observable implements Runnable {
 
     public int getIdt() {
         return idt;
+    }
+
+    public void pause() {
+        isPaused = true;
+    }
+
+    public void resume() {
+        synchronized (pauseLock) {
+            isPaused = false;
+            pauseLock.notifyAll();
+        }
     }
 
 }

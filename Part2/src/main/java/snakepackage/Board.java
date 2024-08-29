@@ -104,6 +104,7 @@ public class Board extends JLabel implements Observer {
 		}
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -182,21 +183,25 @@ public class Board extends JLabel implements Observer {
 	}
 
 	private void drawSnake(Graphics g) {
-		for (int i = 0; i < SnakeApp.MAX_THREADS; i++) {
-			for (Cell p : SnakeApp.getApp().snakes[i].getBody()) {
-				if (p.equals(SnakeApp.getApp().snakes[i].getBody().peekFirst())) {
-					g.setColor(new Color(050 + (i * 10), 205, 150));
-					g.fillRect(p.getX() * GridSize.WIDTH_BOX, p.getY()
-									* GridSize.HEIGH_BOX, GridSize.WIDTH_BOX,
-							GridSize.HEIGH_BOX);
-				} else {
-					if (SnakeApp.getApp().snakes[i].isSelected()) {
-						g.setColor(new Color(032, 178, 170));
-					} else
-						g.setColor(new Color(034, 139, 034));
-					g.fillRect(p.getX() * GridSize.WIDTH_BOX, p.getY()
-									* GridSize.HEIGH_BOX, GridSize.WIDTH_BOX,
-							GridSize.HEIGH_BOX);
+		SnakeApp app = SnakeApp.getApp();
+		if (app != null && app.snakes != null) {
+			for (int i = 0; i < SnakeApp.MAX_THREADS; i++) {
+				if (app.snakes[i] != null) {
+					for (Cell p : app.snakes[i].getBody()) {
+						if (p != null) {
+							if (p.equals(app.snakes[i].getBody().peekFirst())) {
+								g.setColor(new Color(050 + (i * 10), 205, 150));
+							} else {
+								if (app.snakes[i].isSelected()) {
+									g.setColor(new Color(032, 178, 170));
+								} else {
+									g.setColor(new Color(034, 139, 034));
+								}
+							}
+							g.fillRect(p.getX() * GridSize.WIDTH_BOX, p.getY() * GridSize.HEIGH_BOX,
+									GridSize.WIDTH_BOX, GridSize.HEIGH_BOX);
+						}
+					}
 				}
 			}
 		}
@@ -221,7 +226,7 @@ public class Board extends JLabel implements Observer {
 	}
 
 	@Override
-	public void update(Observable arg0, Object arg1) {
+	public void update(Observable o, Object arg) {
 		repaint();
 	}
 }
