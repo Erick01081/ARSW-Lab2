@@ -31,6 +31,7 @@ public class Snake extends Observable implements Runnable {
     private final Object lockSnakeBody = new Object();
     private boolean isPaused = false;
     private final Object pauseLock = new Object();
+    private static Snake diedFirst;
 
     public Snake(int idt, Cell head, int direction) {
         this.idt = idt;
@@ -57,35 +58,58 @@ public class Snake extends Observable implements Runnable {
     @Override
     public void run() {
         while (!snakeEnd) {
-            synchronized (pauseLock) {
-                if (isPaused) {
-                    try {
-                        pauseLock.wait();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
-            }
-
+            pauseSnakeExecution();
             snakeCalc();
-
-            synchronized (lockGui) {
-                setChanged();
-                notifyObservers();
-            }
-
-            try {
-                if (hasTurbo) {
-                    Thread.sleep(1 / 3);
-                } else {
-                    Thread.sleep(1);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            updateGui();
+            snakeHasTurbo();
         }
         fixDirection(head);
+        if(diedFirst == null){
+            diedFirst = this;
+        }
+    }
+
+    public static String getDiedFirst(){
+        String idDiedFirts;
+        if(diedFirst != null) {
+            idDiedFirts = diedFirst.getIdt() + "";
+        }
+        else {
+            idDiedFirts = "No";
+        }
+        return idDiedFirts;
+    }
+
+    private void snakeHasTurbo(){
+        try {
+            if (hasTurbo) {
+                Thread.sleep(1 / 3);
+            } else {
+                Thread.sleep(1);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateGui(){
+        synchronized (lockGui) {
+            setChanged();
+            notifyObservers();
+        }
+    }
+
+    private void pauseSnakeExecution(){
+        synchronized (pauseLock) {
+            if (isPaused) {
+                try {
+                    pauseLock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+        }
     }
 
     private void snakeCalc() {

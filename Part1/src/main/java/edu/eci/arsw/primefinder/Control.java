@@ -67,7 +67,6 @@ public class Control extends Thread {
                 Thread.currentThread().interrupt();
             }
         }
-
         resumeThreads();
     }
 

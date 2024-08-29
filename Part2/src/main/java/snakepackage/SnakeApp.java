@@ -115,15 +115,16 @@ public class SnakeApp {
             pauseButton.setEnabled(true);
             resumeButton.setEnabled(false);
             infoLabel.setText("Game resumed");
+            updateInfoLabel();
         }
     }
 
     private void updateInfoLabel() {
         Snake longestSnake = findLongestSnake();
-        Snake worstSnake = findWorstSnake();
+        String worstSnake = findWorstSnake();
         String info = "Longest snake: " + longestSnake.getIdt() +
                 " (length: " + longestSnake.getBody().size() + "), " +
-                "Worst snake: " + worstSnake.getIdt();
+                "Worst snake: " + worstSnake;
         infoLabel.setText(info);
     }
 
@@ -137,13 +138,12 @@ public class SnakeApp {
         return longest;
     }
 
-    private Snake findWorstSnake() {
-        for (Snake snake : snakes) {
-            if (snake.isSnakeEnd()) {
-                return snake;
-            }
+    private String findWorstSnake() {
+        String diedFirst = Snake.getDiedFirst();
+        if(diedFirst.equals("No")){
+            diedFirst = "No one died";
         }
-        return snakes[0]; // If no snake has died yet, return the first one
+        return diedFirst;
     }
 
     public static SnakeApp getApp() {

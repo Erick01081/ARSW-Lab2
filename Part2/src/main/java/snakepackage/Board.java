@@ -107,7 +107,6 @@ public class Board extends JLabel implements Observer {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
 		drawGrid(g);
 		drawSnake(g);
 		drawFood(g);
@@ -132,9 +131,7 @@ public class Board extends JLabel implements Observer {
 
 	private void drawJumpPads(Graphics g) {
 		Image jump = null;
-                
                 InputStream resource=ClassLoader.getSystemResourceAsStream("Img/up.png");
-
                 try {
 			jump = ImageIO.read(resource);
 		} catch (IOException e) {
@@ -147,11 +144,8 @@ public class Board extends JLabel implements Observer {
 	}
 
 	private void drawBarriers(Graphics g) {
-
 		Image firewall = null;
-                
                 InputStream resource=ClassLoader.getSystemResourceAsStream("Img/firewall.png");
-
                 try {
 			firewall = ImageIO.read(resource);
 		} catch (IOException e) {
@@ -169,7 +163,6 @@ public class Board extends JLabel implements Observer {
 	private void drawFood(Graphics g) {
 		Image mouse = null;
                 InputStream resource=ClassLoader.getSystemResourceAsStream("Img/mouse.png");
-		
 		try {
 			mouse = ImageIO.read(resource);
 		} catch (IOException e) {
